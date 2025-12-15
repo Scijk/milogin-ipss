@@ -143,6 +143,9 @@ Respuesta:
   "token": "jwt-token"
 }
 ```
+![Inicio de sesión](assets/images/readme/image-3.png)
+
+![Login exitoso](assets/images/readme/image-2.png)
 
 ---
 
@@ -159,6 +162,9 @@ Body:
   "password": "password123"
 }
 ```
+![Crear cuenta](assets/images/readme/image.png)
+
+![Registro exitoso](assets/images/readme/image-1.png)
 
 ---
 
@@ -172,6 +178,9 @@ Authorization: Bearer <token>
 ```
 
 ---
+Lista todos los todo existentes y permite crear nuevo
+![Listado de todos](assets/images/readme/image-11.png)
+---
 
 #### Obtener Todo
 
@@ -180,6 +189,9 @@ GET /todos/{id}
 Authorization: Bearer <token>
 ```
 
+---
+Detalle del registro
+![Detalle de registro todo](assets/images/readme/image-7.png)
 ---
 
 #### Crear Todo
@@ -200,7 +212,12 @@ Body:
   }
 }
 ```
+---
+Se crea nuevo registro "salida al parque"
+![Crear todo](assets/images/readme/image-5.png)
 
+Se muestra el nuevo registro en el listado
+![Nuevo registro creado](assets/images/readme/image-6.png)
 ---
 
 #### Editar Todo
@@ -211,6 +228,12 @@ Authorization: Bearer <token>
 ```
 
 ---
+Se edita todo, completado cambia a true
+![Editar todo](assets/images/readme/image-8.png)
+
+Se muestra todo modificado, con completado en true
+![Todo modificado](assets/images/readme/image-9.png)
+---
 
 #### Eliminar Todo
 
@@ -219,6 +242,12 @@ DELETE /todos/{id}
 Authorization: Bearer <token>
 ```
 
+---
+Se elimina registro todo
+![Eliminar registro](assets/images/readme/image-10.png)
+
+Se muestra listado sin el registro eliminado
+![Elminado de lista](assets/images/readme/image-4.png)
 ---
 
 ## 🗺️ Funcionalidades destacadas
