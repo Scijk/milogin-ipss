@@ -1,50 +1,271 @@
-# Welcome to your Expo app 👋
+# 📱 Todo Mobile App (React Native + Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicación mobile desarrollada con **React Native + Expo**, que permite a un usuario autenticado **registrarse, iniciar sesión y gestionar un listado de Todos**, incluyendo:
 
-## Get started
+- Autenticación JWT
+- CRUD completo de Todos
+- Captura de ubicación GPS
+- Visualización de mapa por Todo
+- Manejo de sesión (login, logout, expiración)
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+Usuarios registrados
+cgomez@example.com / password123 - Lista con todos
+user@example.com / password123 - Sin todos
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🚀 Tecnologías
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **React Native** (Expo)
+- **Expo Router** (file-based routing)
+- **TypeScript**
+- **Axios** (HTTP client)
+- **Expo SecureStore** (almacenamiento seguro de token)
+- **Expo Location** (GPS)
+- **React Native Maps** (mapas)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📂 Estructura del proyecto
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/
+ ├─ index.tsx              # Login
+ ├─ register.tsx           # Registro
+ ├─ (protected)/
+ │   ├─ _layout.tsx        # Protección por sesión
+ │   ├─ todos.tsx          # Listado + creación
+ │   ├─ detalle-todo.tsx   # Detalle del Todo
+ │   ├─ edit-todo.tsx      # Edición
+src/
+ ├─ api/
+ │   └─ client.ts          # Axios + interceptores
+ ├─ services/
+ │   ├─ auth.service.ts
+ │   ├─ todo-list-service.ts
+ │   ├─ token.service.ts
+ │   └─ session.service.ts
+ ├─ theme/
+ └─ types/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## ⚙️ Requisitos previos
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Node.js v22**
+- **npm** o **pnpm**
+- **Expo CLI**
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install -g expo-cli
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## ▶️ Levantar el proyecto en local
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm install
+npx expo start
+```
+
+Luego:
+- Presiona **a** para Android Emulator
+- Presiona **w** para Web
+- Escanea QR con Expo Go
+
+---
+
+## 🔐 Variables de entorno
+
+Este proyecto utiliza **variables de entorno públicas de Expo**.
+
+### 📁 `.env`
+
+```env
+EXPO_PUBLIC_API_BASE_URL=https://todo-list-hono-api-ipss.ibreeqq.workers.dev
+```
+
+> ⚠️ Todas las variables que se usen en Expo **deben comenzar con `EXPO_PUBLIC_`**
+
+---
+
+## 🌍 Configuración por entorno
+
+### 🧪 Local
+
+```env
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8787
+```
+
+### 🚀 Producción
+
+```env
+EXPO_PUBLIC_API_BASE_URL=https://todo-list-hono-api-ipss.ibreeqq.workers.dev
+```
+
+---
+
+## 🔑 Manejo de sesión
+
+- El token JWT se guarda en **Expo SecureStore**
+- Se valida expiración usando `exp`
+- Logout automático al recibir **401**
+- Rutas protegidas con `(protected)/_layout.tsx`
+
+---
+
+## 📡 Endpoints utilizados
+
+### 🔐 Autenticación
+
+#### Login
+
+```
+POST /auth/login
+```
+
+Body:
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+Respuesta:
+```json
+{
+  "token": "jwt-token"
+}
+```
+
+---
+
+#### Registro
+
+```
+POST /auth/register
+```
+
+Body:
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+---
+
+### ✅ Todos
+
+#### Listar Todos
+
+```
+GET /todos
+Authorization: Bearer <token>
+```
+
+---
+
+#### Obtener Todo
+
+```
+GET /todos/{id}
+Authorization: Bearer <token>
+```
+
+---
+
+#### Crear Todo
+
+```
+POST /todos
+Authorization: Bearer <token>
+```
+
+Body:
+```json
+{
+  "title": "Nuevo Todo",
+  "completed": false,
+  "location": {
+    "latitude": -33.4,
+    "longitude": -70.6
+  }
+}
+```
+
+---
+
+#### Editar Todo
+
+```
+PUT /todos/{id}
+Authorization: Bearer <token>
+```
+
+---
+
+#### Eliminar Todo
+
+```
+DELETE /todos/{id}
+Authorization: Bearer <token>
+```
+
+---
+
+## 🗺️ Funcionalidades destacadas
+
+- ✔ Login / Registro
+- ✔ Sesión persistente
+- ✔ CRUD de Todos
+- ✔ Ubicación GPS opcional
+- ✔ Visualización en mapa
+- ✔ Manejo de errores y loaders
+
+---
+
+## 🔒 Seguridad
+
+- JWT enviado vía `Authorization: Bearer`
+- Token almacenado de forma segura
+- Expiración validada en cliente
+
+---
+
+## 🧪 Debugging
+
+```bash
+npx expo start -c
+```
+
+Limpia cache si hay problemas.
+
+---
+
+## 📌 Pendientes / Mejoras
+
+- Subida de imagen por Todo
+- Refresh token
+- Pull to refresh
+- Testing (Jest / Detox)
+
+---
+
+## 👨‍💻 Autor
+
+Proyecto desarrollado como base de aplicación mobile moderna con Expo.
+
+---
+
+## 📄 Licencia
+
+MIT
+
