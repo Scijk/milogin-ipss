@@ -1,12 +1,16 @@
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { jwtDecode } from 'jwt-decode';
 import { api } from '../api/client';
 import { LoginResponse, RegisterRequest, RegisterResponse } from '../types/auth.types';
+
+type JwtPayload = {
+  exp?: number;
+};
 
 const TOKEN_KEY = 'auth_token';
 
 export const login = async (email: string, password: string) => {
-  console.log('Intentando login con:', { email, password });
   try {
     const { data } = await api.post<LoginResponse>('/auth/login', {
       email,
@@ -47,9 +51,29 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     if (error.response?.status === 401) {
-      await deleteToken();
+      await logout();
       router.replace('/');
     }
     return Promise.reject(error);
   }
 );
+
+export const isTokenExpired = async (): Promise<boolean> => {
+  const token = await getToken();
+  if (!token) return true;
+
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+
+    if (!decoded.exp) return true;
+
+    const now = Date.now() / 1000;
+    return decoded.exp < now;
+  } catch {
+    return true;
+  }
+};
+
+export const logout = async () => {
+  await deleteToken();
+};

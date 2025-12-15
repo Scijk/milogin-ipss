@@ -7,3 +7,4 @@ export const api = axios.create({
     'Content-Type': 'application/json'
   }
 });
+console.log('API Base URL:', process.env.EXPO_PUBLIC_API_URL);

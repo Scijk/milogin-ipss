@@ -18,6 +18,20 @@ export type TodoUpdateRequest = {
   photoUri?: string;
 };
 
+export type TodoListResponse = {
+    id: string;
+    userId: string;
+    title: string;
+    completed: boolean;
+    location?: {
+        latitude: number;
+        longitude: number;
+    };
+    photoUri?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
 export type TodoResponse = {
     success: boolean;
     data: {
@@ -35,4 +49,8 @@ export type TodoResponse = {
     };
 };
 
-export type TodoItem = TodoResponse['data'];
+export type TodoItem = { 
+    count: number;
+    success: boolean;
+    data: TodoListResponse[];
+}

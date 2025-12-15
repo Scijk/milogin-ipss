@@ -1,4 +1,4 @@
-import { deleteToken } from "@/src/services/token.service";
+import { logout } from "@/src/services/token.service";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -18,10 +18,10 @@ import {
   listTodos,
 } from "../../src/services/todo-list-service";
 import { colors } from "../../src/theme/colors";
-import { TodoItem, TodoRequest } from "../../src/types/TodoItem";
+import { TodoListResponse, TodoRequest } from "../../src/types/TodoItem";
 
 export default function TodosScreen() {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [todos, setTodos] = useState<TodoListResponse[]>();
   const [title, setTitle] = useState("");
   const [completed, setCompleted] = useState(false);
   const [includeLocation, setIncludeLocation] = useState(false);
@@ -32,6 +32,7 @@ export default function TodosScreen() {
     try {
       setLoading(true);
       const data = await listTodos();
+      
       setTodos(data);
     } catch {
       Alert.alert("Error", "No se pudieron cargar los datos");
@@ -70,11 +71,12 @@ export default function TodosScreen() {
       setLoading(true);
       const res = await createTodo(payload);
 
-      if (res.success) {
+      if (res) {
         setTitle("");
         setCompleted(false);
         setIncludeLocation(false);
         loadTodos();
+        Alert.alert("Éxito", "Registro creado correctamente");
       } else {
         Alert.alert("Error", "No se pudo crear el registro");
       }
@@ -90,6 +92,7 @@ export default function TodosScreen() {
     try {
       await deleteTodo(id);
       loadTodos();
+      Alert.alert("Éxito", "Eliminado correctamente");
     } catch {
       Alert.alert("Error", "No se pudo eliminar");
     }
@@ -100,131 +103,149 @@ export default function TodosScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, padding: 16 }}>
-      <Pressable
-        onPress={async () => {
-          await deleteToken();
-          router.replace('/');
-        }}
-        style={{
-          alignSelf: 'flex-end',
-          marginBottom: 8
-        }}>
-        <Text style={{ color: colors.error, fontWeight: 'bold' }}>
-          Cerrar sesión
-        </Text>
-      </Pressable>
-      <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 12 }}>
-        Mantenedor de Todos
-      </Text>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <FlatList
+        data={todos}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: 16 }}
+        ListHeaderComponent={
+          <>
+            {/* LOGOUT */}
+            <Pressable
+              onPress={async () => {
+                await logout();
+                router.replace('/');
+              }}
+              style={{ alignSelf: 'flex-end', marginBottom: 8 }}
+            >
+              <Text style={{ color: colors.error, fontWeight: 'bold' }}>
+                Cerrar sesión
+              </Text>
+            </Pressable>
 
-      {/* FORM */}
-      <View
-        style={{
-          backgroundColor: colors.surface,
-          padding: 12,
-          borderRadius: 12,
-          marginBottom: 16,
-        }}
-      >
-        <TextInput
-          placeholder="Título"
-          value={title}
-          onChangeText={setTitle}
-          style={{
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 8,
-            padding: 10,
-            marginBottom: 10,
-            backgroundColor: colors.surface,
-          }}
-        />
+            <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 12 }}>
+              Crear nuevo Todo
+            </Text>
 
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <Text style={{ flex: 1 }}>Completado</Text>
-          <Switch value={completed} onValueChange={setCompleted} />
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <Text style={{ flex: 1 }}>Incluir ubicación</Text>
-          <Switch value={includeLocation} onValueChange={setIncludeLocation} />
-        </View>
-
-        <Pressable
-          onPress={handleCreate}
-          style={{
-            backgroundColor: colors.accent,
-            padding: 12,
-            borderRadius: 10,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "bold" }}>Crear Todo</Text>
-        </Pressable>
-      </View>
-
-      {/* LIST */}
-      {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <FlatList
-          data={todos}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+            {/* FORM */}
             <View
               style={{
                 backgroundColor: colors.surface,
                 padding: 12,
-                borderRadius: 10,
-                marginBottom: 8,
+                borderRadius: 12,
+                marginBottom: 16,
               }}
             >
-              <Text style={{ fontWeight: "600" }}>{item.title}</Text>
-              <Text>
-                Estado: {item.completed ? "✅ Completado" : "⏳ Pendiente"}
-              </Text>
+              <TextInput
+                placeholder="Título"
+                value={title}
+                onChangeText={setTitle}
+                placeholderTextColor={colors.textSecondary}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 8,
+                  padding: 10,
+                  marginBottom: 10,
+                  backgroundColor: colors.surface,
+                  color: colors.textPrimary
+                }}
+              />
 
-              {item.location && (
-                <Text style={{ fontSize: 12, color: colors.textSecondary }}>
-                  📍 {item.location.latitude}, {item.location.longitude}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ flex: 1, color: colors.textPrimary }}>Completado</Text>
+                <Switch value={completed} onValueChange={setCompleted} />
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ flex: 1, color: colors.textPrimary }}>
+                  Incluir ubicación
                 </Text>
-              )}
+                <Switch value={includeLocation} onValueChange={setIncludeLocation} />
+              </View>
 
               <Pressable
-                onPress={() =>
-                    router.push({
-                    pathname: '/(protected)/edit-todo',
-                    params: { id: item.id }
-                    })
-                }
-                style={{ marginTop: 6 }}
-                >
-                <Text style={{ color: colors.accent }}>Editar</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => handleDelete(item.id)}
-                style={{ marginTop: 8 }}
+                onPress={handleCreate}
+                style={{
+                  backgroundColor: colors.accent,
+                  padding: 12,
+                  borderRadius: 10,
+                  alignItems: 'center',
+                }}
               >
-                <Text style={{ color: "#E53935" }}>Eliminar</Text>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+                  Crear Todo
+                </Text>
               </Pressable>
             </View>
-          )}
-        />
-      )}
+
+            {loading && <ActivityIndicator style={{ marginBottom: 16 }} />}
+          </>
+        }
+        renderItem={({ item }) => (
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              padding: 12,
+              borderRadius: 10,
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ fontWeight: '600', color: colors.textPrimary }}>
+              {item.title}
+            </Text>
+
+            <Text style={{ color: colors.textSecondary }}>
+              Estado: {item.completed ? '✅ Completado' : '⏳ Pendiente'}
+            </Text>
+
+            {item.location && (
+              <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+                📍 {item.location.latitude}, {item.location.longitude}
+              </Text>
+            )}
+
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: '/(protected)/detalle-todo',
+                  params: { id: item.id },
+                })
+              }
+            >
+              <Text style={{ color: colors.accent, marginTop: 6 }}>
+                Ver detalle
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: '/(protected)/edit-todo',
+                  params: { id: item.id },
+                })
+              }
+              style={{ marginTop: 6 }}
+            >
+              <Text style={{ color: colors.accent }}>Editar</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleDelete(item.id)}
+              style={{ marginTop: 8 }}
+            >
+              <Text style={{ color: colors.error }}>Eliminar</Text>
+            </Pressable>
+          </View>
+        )}
+        ListEmptyComponent={
+          !loading ? (
+            <Text style={{ textAlign: 'center', color: colors.textSecondary }}>
+              No hay todos registrados
+            </Text>
+          ) : null
+        }
+      />
     </View>
   );
 }

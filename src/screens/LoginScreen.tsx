@@ -12,8 +12,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      //Alert.alert('Error', 'Debes ingresar email y contraseña');
-      window.alert('Debes ingresar email y contraseña');
+      Alert.alert('Error', 'Debes ingresar email y contraseña');
       return;
     }
 
@@ -23,8 +22,7 @@ export default function LoginScreen() {
 
       if (response.success && response.data && response.data.token) {
         await saveToken(response.data.token);
-        //Alert.alert('Éxito', 'Login correcto ✅');
-        window.alert('Login correcto');
+        Alert.alert('Éxito', 'Login correcto ✅');
         router.replace('./(protected)/todos');
       } else {
         Alert.alert('Error', response.error || 'Credenciales inválidas');

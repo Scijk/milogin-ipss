@@ -12,35 +12,55 @@ const authHeader = async () => {
 };
 
 export const listTodos = async () => {
-  const { data } = await api.get<TodoItem[]>('/todos', {
-    headers: await authHeader()
-  });
-  return data;
+  try {
+    const { data } = await api.get<TodoItem>('/todos', {
+      headers: await authHeader()
+    });
+    return data.data;
+  } catch (error) {
+    console.log('Error listando todos:', error);
+    throw error;
+  }
 };
 
 export const getTodo = async (id: string) => {
-  const { data } = await api.get<TodoItem>(`/todos/${id}`, {
-    headers: await authHeader()
-  });
-  return data;
+  try {
+    const { data } = await api.get<TodoResponse>(`/todos/${id}`, {
+      headers: await authHeader()
+    });
+    return data.data;
+  } catch (error) {
+    console.log('Error obteniendo todo:', error);
+    throw error;
+  }
 };
 
 export const createTodo = async (request: TodoRequest) => {
-  const { data } = await api.post<TodoResponse>('/todos',
-    { request },
-    { headers: {
-        ...(await authHeader())
-     }
-    }
-  );
-  return data;
+  try {
+    const { data } = await api.post<TodoResponse>('/todos',
+      request,
+      { headers: {
+          ...(await authHeader())
+      }
+      }
+    );
+    return data;
+  } catch (error) {
+    console.log('Error creando todo:', error);
+    throw error;
+  }
 };
 
 export const deleteTodo = async (id: string) => {
-  const { data } = await api.delete(`/todos/${id}`, {
-    headers: await authHeader()
-  });
-  return data;
+  try {
+    const { data } = await api.delete(`/todos/${id}`, {
+      headers: await authHeader()
+    });
+    return data;
+  } catch (error) {
+    console.log('Error eliminando todo:', error);
+    throw error;
+  }
 };
 
 export const updateTodo = async (id: string, payload: TodoUpdateRequest) => {
