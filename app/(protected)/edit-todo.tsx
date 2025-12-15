@@ -59,7 +59,7 @@ export default function EditTodoScreen() {
       });
 
       if (res.success) {
-        router.back();
+        router.replace('./(protected)/todos');
       } else {
         Alert.alert('Error', 'No se pudo actualizar');
       }
